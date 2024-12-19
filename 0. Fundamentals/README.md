@@ -1,8 +1,8 @@
-# Introduction
+# Fundamentales
 
 
-The basic part is intended for **absolute beginners**. Intermediate users are welcome to skip this part.
+This part is perfect for **beginners**. If you're already an intermediate user, no worries—you can skip ahead.
 
 
-In this section, you'll learn about **Node Package Manager (NPM)**, **Webpack**, and **Typescript**.
+In this section, we're going to take a look at **Node Package Manager (NPM)**, **Webpack**, and **Typescript***.
 
