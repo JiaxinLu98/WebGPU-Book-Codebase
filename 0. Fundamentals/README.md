@@ -1,3 +1,7 @@
+# Overview
+
+In this section, we're going to take a look at NPM, Webpack, TypeScript, and WebGPU. We'll also write a simple code to check if WebGPU works on the browser.
+
 # Node Package Manager
 
 Node Package Manager is used to take bundles of code from other repositories or other developers and integrate them into our project's code.
