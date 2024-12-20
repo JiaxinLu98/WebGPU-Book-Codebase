@@ -2,7 +2,7 @@
 
 In this section, we're going to take a look at NPM, Webpack, TypeScript, and WebGPU. We'll also write a simple code to check if WebGPU works on the browser.
 
-# Node Package Manager
+# 1. Node Package Manager
 
 Node Package Manager is used to take bundles of code from other repositories or other developers and integrate them into our project's code.
 
@@ -20,7 +20,7 @@ Node Package Manager is used to take bundles of code from other repositories or 
 
 Note: You can change `"main": "index.js"` to `"main": "app.js"` in `package.json`, because using `"app.js"` for an application's entry point.
 
-# Webpack
+# 2. Webpack
 
 Webpack is used to bundle multiple JavaScript files into a single or multiple optimised output files for production.
 
@@ -30,7 +30,7 @@ Webpack is used to bundle multiple JavaScript files into a single or multiple op
 2. Change `"test": "echo \"Error: no test specified\" && exit 1"` to `"build": "webpack", "serve": "webpack server", "deploy": "webpack --mode=production"` in `package.json`.
 3. Create a JS file `webpack.config.js`, and copy my `webpack.config.js` into yours.
 
-# Typescript
+# 3. Typescript
 
 TypeScript is a programming language that builds on JavaScript by adding static types.
 
@@ -39,7 +39,7 @@ TypeScript is a programming language that builds on JavaScript by adding static 
 1. Run `npm i typescript ts-loader --save-dev`.
 2. Create a JSON file `tsconfig.json`, and copy my `tsconfig.json` into yours.
 
-# WebGPU
+# 4. WebGPU
 
 WebGPU is a JavaScript API provided by a web browser that enables webpage scripts to efficiently utilize a device's graphics processing unit (GPU). This is achieved with the underlying Vulkan, Metal, or Direct3D 12 system APIs. On relevant devices, WebGPU is intended to supersede the older WebGL standard.
 
@@ -47,7 +47,7 @@ WebGPU is a JavaScript API provided by a web browser that enables webpage script
 
 1. Run `npm i @webgpu/types`.
 
-# Test 
+# 5. Test 
 
 1. Create an HTML file `index.html`, and copy my `index.html` into yours.
 2. Create a new folder `src` inside your project folder and copy my `app.ts` into your `app.ts`.
