@@ -14,7 +14,7 @@ Node Package Manager is used to take bundles of code from other repositories or 
 2. Run `code .` to open your VS Code.
 3. Run `npm init -y` to initialize a new project.
 
-Note: You can change `"main": "index.js"` to `"main": "app.js"` in `package.json`, because use `"app.js"` for an application's entry point.
+Note: You can change `"main": "index.js"` to `"main": "app.js"` in `package.json`, because using `"app.js"` for an application's entry point.
 
 # Webpack
 
@@ -24,7 +24,7 @@ Webpack is used to bundle multiple JavaScript files into a single or multiple op
 
 1. Run `npm i webpack webpack-cli webpack-dev-server html-webpack-plugin --save-dev` to install Webpack, Webpack CLI, Webpack Dev Server, and HTML Webpack Plugin.
 2. Change `"test": "echo \"Error: no test specified\" && exit 1"` to `"build": "webpack", "serve": "webpack server", "deploy": "webpack --mode=production"` in `package.json`.
-3. Create a JS file `webpack.config.js`, copy my `webpack.config.js` into yours.
+3. Create a JS file `webpack.config.js`, and copy my `webpack.config.js` into yours.
 
 # Typescript
 
@@ -33,7 +33,7 @@ TypeScript is a programming language that builds on JavaScript by adding static 
 ## Installation Typescript on Windows
 
 1. Run `npm i typescript ts-loader --save-dev`.
-2. Create a JSON file `tsconfig.json`, copy my `tsconfig.json` into yours.
+2. Create a JSON file `tsconfig.json`, and copy my `tsconfig.json` into yours.
 
 # WebGPU
 
@@ -45,8 +45,9 @@ WebGPU is a JavaScript API provided by a web browser that enables webpage script
 
 # Test 
 
-1. Create a HTML file `index.html`, copy my `index.html` into yours.
+1. Create an HTML file `index.html`, and copy my `index.html` into yours.
 2. Create a new folder `src` inside your project folder and copy my `app.ts` into your `app.ts`.
 3. In Command Prompt, run `npm run serve`, click http://localhost:8080/
 4. If everything's working you should see this page in your browser when you run the application:
-   !(result.png)
+   
+   ![result](result.png)
