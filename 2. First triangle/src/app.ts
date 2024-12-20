@@ -1,133 +1,80 @@
-// We use webpack to package our shaders as string resources that we can import
-import shaderCode from "./triangle.wgsl";
+import shader from "./triangle.wgsl";
 
-(async () =>
-{
-    if (navigator.gpu === undefined) {
-        document.getElementById("webgpu-canvas").setAttribute("style", "display:none;");
-        document.getElementById("no-webgpu").setAttribute("style", "display:block;");
-        return;
-    }
+const Initialize = async() => {
 
-    // Get a GPU device to render with
-    var adapter = await navigator.gpu.requestAdapter();
-    var device = await adapter.requestDevice();
-
-    // Get a context to display our rendered image on the canvas
-    var canvas = document.getElementById("webgpu-canvas") as HTMLCanvasElement;
-    var context = canvas.getContext("webgpu");
-
-    // Setup shader modules
-    var shaderModule = device.createShaderModule({code: shaderCode});
-    var compilationInfo = await shaderModule.getCompilationInfo();
-    if (compilationInfo.messages.length > 0) {
-        var hadError = false;
-        console.log("Shader compilation log:");
-        for (var i = 0; i < compilationInfo.messages.length; ++i) {
-            var msg = compilationInfo.messages[i];
-            console.log(`${msg.lineNum}:${msg.linePos} - ${msg.message}`);
-            hadError = hadError || msg.type == "error";
-        }
-        if (hadError) {
-            console.log("Shader failed to compile");
-            return;
-        }
-    }
-
-    // Specify vertex data
-    // Allocate room for the vertex data: 3 vertices, each with 2 float4's
-    var dataBuf = device.createBuffer(
-        {size: 3 * 2 * 4 * 4, usage: GPUBufferUsage.VERTEX, mappedAtCreation: true});
-
-    // Interleaved positions and colors
-    new Float32Array(dataBuf.getMappedRange()).set([
-        1, -1, 0, 1,  // position
-        1, 0, 0, 1,  // color
-        -1, -1, 0, 1,  // position
-        0, 1, 0, 1,  // color
-        0, 1, 0, 1,  // position
-        0, 0, 1, 1,  // color
-    ]);
-    dataBuf.unmap();
-
-    // Vertex attribute state and shader stage
-    var vertexState = {
-        // Shader stage info
-        module: shaderModule,
-        entryPoint: "vertex_main",
-        // Vertex buffer info
-        buffers: [{
-            arrayStride: 2 * 4 * 4,
-            attributes: [
-                {format: "float32x4" as GPUVertexFormat, offset: 0, shaderLocation: 0},
-                {format: "float32x4" as GPUVertexFormat, offset: 4 * 4, shaderLocation: 1}
-            ]
-        }]
-    };
-
-    // Setup render outputs
-    var swapChainFormat = "bgra8unorm" as GPUTextureFormat;
-    context.configure(
-        {device: device, format: swapChainFormat, usage: GPUTextureUsage.RENDER_ATTACHMENT});
-
-    var depthFormat = "depth24plus-stencil8" as GPUTextureFormat;
-    var depthTexture = device.createTexture({
-        size: {width: canvas.width, height: canvas.height, depthOrArrayLayers: 1},
-        format: depthFormat,
-        usage: GPUTextureUsage.RENDER_ATTACHMENT
+    const canvas : HTMLCanvasElement = <HTMLCanvasElement> document.getElementById("gfx-main");
+    //adapter: wrapper around (physical) GPU.
+    //Describes features and limits
+    const adapter : GPUAdapter = <GPUAdapter> await navigator.gpu?.requestAdapter();
+    //device: wrapper around GPU functionality
+    //Function calls are made through the device
+    const device : GPUDevice = <GPUDevice> await adapter?.requestDevice();
+    //context: similar to vulkan instance (or OpenGL context)
+    const context : GPUCanvasContext = <GPUCanvasContext> canvas.getContext("webgpu");
+    const format : GPUTextureFormat = "bgra8unorm";
+    context.configure({
+        device: device,
+        format: format,
+        alphaMode: "opaque"
     });
 
-    var fragmentState = {
-        // Shader info
-        module: shaderModule,
-        entryPoint: "fragment_main",
-        // Output render target info
-        targets: [{format: swapChainFormat}]
-    };
-
-    // Create render pipeline
-    var layout = device.createPipelineLayout({bindGroupLayouts: []});
-
-    var renderPipeline = device.createRenderPipeline({
-        layout: layout,
-        vertex: vertexState,
-        fragment: fragmentState,
-        depthStencil: {format: depthFormat, depthWriteEnabled: true, depthCompare: "less"}
+    const bindGroupLayout = device.createBindGroupLayout({
+        entries: [],
     });
 
-    var renderPassDesc = {
+    const bindGroup = device.createBindGroup({
+        layout: bindGroupLayout,
+        entries: []
+    });
+    
+    const pipelineLayout = device.createPipelineLayout({
+        bindGroupLayouts: [bindGroupLayout]
+    });
+
+    const pipeline = device.createRenderPipeline({
+        vertex : {
+            module : device.createShaderModule({
+                code : shader
+            }),
+            entryPoint : "vs_main"
+        },
+
+        fragment : {
+            module : device.createShaderModule({
+                code : shader
+            }),
+            entryPoint : "fs_main",
+            targets : [{
+                format : format
+            }]
+        },
+
+        primitive : {
+            topology : "triangle-list"
+        },
+
+        layout: pipelineLayout
+    });
+
+    //command encoder: records draw commands for submission
+    const commandEncoder : GPUCommandEncoder = device.createCommandEncoder();
+    //texture view: image view to the color buffer in this case
+    const textureView : GPUTextureView = context.getCurrentTexture().createView();
+    //renderpass: holds draw commands, allocated from command encoder
+    const renderpass : GPURenderPassEncoder = commandEncoder.beginRenderPass({
         colorAttachments: [{
-            view: null as GPUTextureView,
-            loadOp: "clear" as GPULoadOp,
-            clearValue: [0.3, 0.3, 0.3, 1],
-            storeOp: "store" as GPUStoreOp
-        }],
-        depthStencilAttachment: {
-            view: depthTexture.createView(),
-            depthLoadOp: "clear" as GPULoadOp,
-            depthClearValue: 1.0,
-            depthStoreOp: "store" as GPUStoreOp,
-            stencilLoadOp: "clear" as GPULoadOp,
-            stencilClearValue: 0,
-            stencilStoreOp: "store" as GPUStoreOp
-        }
-    };
+            view: textureView,
+            clearValue: {r: 0.5, g: 0.0, b: 0.25, a: 1.0},
+            loadOp: "clear",
+            storeOp: "store"
+        }]
+    });
+    renderpass.setPipeline(pipeline);
+    renderpass.setBindGroup(0, bindGroup)
+    renderpass.draw(3, 1, 0, 0);
+    renderpass.end();
 
-    // Render!
-    const render = () => {
-        renderPassDesc.colorAttachments[0].view = context.getCurrentTexture().createView();
+    device.queue.submit([commandEncoder.finish()]);
+}
 
-        var commandEncoder = device.createCommandEncoder();
-
-        var renderPass = commandEncoder.beginRenderPass(renderPassDesc);
-
-        renderPass.setPipeline(renderPipeline);
-        renderPass.setVertexBuffer(0, dataBuf);
-        renderPass.draw(3, 1, 0, 0);
-
-        renderPass.end();
-        device.queue.submit([commandEncoder.finish()]);
-        requestAnimationFrame(render);
-    };
-    requestAnimationFrame(render);
-})();
+Initialize();
